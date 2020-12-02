@@ -1,8 +1,15 @@
 let board = document.getElementById("board");
 var selectedPiece = '';
 let highlighted = [];
+let prefix = 8;
 function drawBoard(){
     for (let i = 0; i < 8; i++){
+        let positionPrefix = document.createElement("div");
+        positionPrefix.className = "positionPrefix";
+        positionPrefix.textContent = prefix;
+        //
+        //board.appendChild(positionPrefix);
+        prefix--;
         for(let j = 0; j < 8; j++){
             let boardPosition = document.createElement("div");
             if(i%2 === 0){
@@ -183,8 +190,20 @@ function validateMoves(){
     var coordinates = [];
     var options = [];
     var startPoint = pieceSelected.position;
-    
+    let i = getBoardIndexPosition(startPoint);
     switch (pieceSelected.type){
+        case "w_king":
+            coordinates = kingOptions(i,coordinates,pieceSelected.type);
+            options = moveOptions(startPoint,coordinates,pieceSelected.type).slice(0);
+            highlighted = options.slice(0);
+            coordinates = toggleHighlight(options);
+            break;
+        case "w_queen":
+            coordinates = queenOptions(i,coordinates,pieceSelected.type);
+            options = moveOptions(startPoint, coordinates, pieceSelected.type).slice(0);
+            highlighted = options.slice(0);
+            coordinates = toggleHighlight(options);
+            break;
         case "w_pawn":
             if(!pieceSelected.moved){
                 coordinates = [{x: 1, y:0},{x: 2, y:0},{x:1,y:1},{x:1,y:-1}].map(function(val){
@@ -198,9 +217,33 @@ function validateMoves(){
             }
             options = moveOptions(startPoint, coordinates,pieceSelected.type).slice(0);
             highlighted = options.slice(0);
-            console.log("highlighted",highlighted);
             toggleHighlight(options);
             break;
+        case "w_bishop":
+            coordinates = bishopOptions(i,coordinates, pieceSelected.type);
+            options = moveOptions(startPoint,coordinates,pieceSelected.type).slice(0);
+            highlighted = options.slice(0);
+            toggleHighlight(options);
+            break;    
+        case "w_knight":
+            //let i = (parseInt(startPoint.split('_')[0])+1);
+            coordinates = knightOptions(i,coordinates,pieceSelected.type);
+            options = moveOptions(startPoint, coordinates, pieceSelected.type).slice(0);
+            highlighted = options.slice(0);
+            toggleHighlight(options);
+            break;
+        case "w_rook":
+            coordinates = rookOptions(i, coordinates, pieceSelected.type);
+            options = moveOptions(startPoint, coordinates,pieceSelected.type).slice(0);
+            highlighted = options.slice(0);
+            toggleHighlight(options);
+            break;
+        case "b_king":
+            coordinates = kingOptions(i,coordinates,pieceSelected.type);
+            options = moveOptions(startPoint,coordinates,pieceSelected.type).slice(0);
+            highlighted = options.slice(0);
+            coordinates = toggleHighlight(options);
+            break;    
         case "b_pawn":
             if(!pieceSelected.moved){
                 coordinates = [{x: 1, y:0},{x: 2, y:0},{x:1,y:1},{x:1,y:-1}].map(function(val){
@@ -214,11 +257,154 @@ function validateMoves(){
             }
             options = moveOptions(startPoint, coordinates,pieceSelected.type).slice(0);
             highlighted = options.slice(0);
-            console.log("highlighted",highlighted);
             toggleHighlight(options);
             break;   
+        case "b_knight":
+            //let i = (parseInt(startPoint.split('_')[0])+1);
+            knightOptions(i,coordinates,pieceSelected.type);
+            options = moveOptions(startPoint, coordinates, pieceSelected.type).slice(0);
+            highlighted = options.slice(0);
+            coordinates = toggleHighlight(options);
+            break;   
+            
+        case "b_queen":
+            coordinates = queenOptions(i,coordinates,pieceSelected.type);
+            options = moveOptions(startPoint, coordinates, pieceSelected.type).slice(0);
+            highlighted = options.slice(0);
+            coordinates = toggleHighlight(options);
+            break;
+        case "b_rook":
+            coordinates = rookOptions(i, coordinates, pieceSelected.type);
+            options = moveOptions(startPoint, coordinates,pieceSelected.type).slice(0);
+            highlighted = options.slice(0);
+            toggleHighlight(options);
+            break;
+        case "b_bishop":
+            coordinates = bishopOptions(i,coordinates, pieceSelected.type);
+            options = moveOptions(startPoint,coordinates,pieceSelected.type).slice(0);
+            highlighted = options.slice(0);
+            toggleHighlight(options);
+            break;  
     }
 
+}
+
+function knightOptions(i, coordinates,type){
+    let r = Math.floor(i/8), c = i % 8;
+    
+    for (let j = -1; j <= 1; j+= 2){
+        for (let k = -1; k <= 1; k += 2) {
+            let x = (r+j);
+            let y = (c+k*2);
+            if(hasPiece(x,y,type)){
+                if(hasEnemy(x,y,type)){
+                    coordinates.push(x+"_"+y);
+                }
+            }else{
+                coordinates.push(x+"_"+y);
+            } 
+            x = (r+ j * 2);
+            y = (c + k);
+            if(hasPiece(x,y,type)){
+                if(hasEnemy(x,y,type)){
+                    coordinates.push(x+"_"+y);
+                }
+            }else{
+                coordinates.push(x+"_"+y);
+            }
+        }
+    }
+    return coordinates;
+}
+function kingOptions(i, coordinates, type){
+    let r = Math.floor(i/8), c = i % 8;
+    //equals(tableroAjedrez[r - 1 + j / 3][c - 1 + j % 3]
+    for(let j = 0; j < 9; j++){
+        let x = Math.floor(r - 1 + j/3);
+        let y = Math.floor(c - 1 + j%3);
+        if(j != 4){
+            if(hasPiece(x,y,type) == true){
+                if(hasEnemy(x,y,type)){
+                    coordinates.push(x+"_"+y);
+                }
+            }else{
+                coordinates.push(x+"_"+y);
+            } 
+        }
+    }
+    return coordinates;
+}
+function queenOptions(i,coordinates,type){
+    let r = Math.floor(i/8), c = i % 8;
+    let counter = 1;
+    for(let j = -1; j <=1; j++){
+        for(let k = -1; k <= 1; k++){
+            let x = (r + counter * j);
+            let y = (c + counter *k);
+            
+            while($('#'+ (r + counter * j)+"_"+(c + counter *k)).attr('chess') == null && $('#'+ (r + counter * j)+"_"+(c + counter *k)).prop("tagName") != null){
+                coordinates.push((r + counter * j)+"_"+(c + counter *k));
+                counter++;   
+            }
+            
+            if(hasPiece((r + counter * j),(c + counter *k),type)){
+                let pieceIndex = $('#'+ (r + counter * j)+"_"+(c + counter *k)).attr('index');
+                if(hasEnemy((r + counter * j),(c + counter *k),type)){
+                    coordinates.push((r + counter * j)+"_"+(c + counter *k));
+                }
+            }
+            counter = 1;
+        }
+    }
+    return coordinates;
+}
+function bishopOptions(i,coordinates, type){
+    let r = Math.floor(i/8), c = i % 8;
+    let counter = 1;
+    for(let j = -1; j <= 1; j += 2){
+        for(let k = -1; k <= 1; k += 2){
+            if(j != 0 || k != 0){
+                while($('#'+(r+counter * j)+"_"+(c + counter *k)).attr('chess') == null && $('#'+(r+counter * j)+"_"+(c + counter *k)).prop('tagName') !=null){
+                    coordinates.push((r + counter * j)+"_"+(c + counter * k));
+                    counter++;
+                }
+                if(hasPiece((r + counter * j),(c + counter *k),type)){
+                    if(hasEnemy((r + counter * j),(c + counter *k),type)){
+                        coordinates.push((r + counter * j)+"_"+(c + counter *k));
+                    }
+                }
+                counter=1;
+            }
+        }
+    }
+    return coordinates;
+}
+function rookOptions(i, coordinates, type){
+    let r = Math.floor(i/8), c = i % 8;
+    let counter = 1;
+    for(let j = -1; j <= 1; j += 2){
+        while($('#'+r+"_"+(c+counter * j)).attr('chess') == null && $('#'+ (r)+"_"+(c + counter *j)).prop("tagName") != null){
+            coordinates.push(r+"_"+(c + counter * j));
+            counter++;
+        }
+        if(hasPiece(r,(c + counter *j),type)){
+            if(hasEnemy((r),(c + counter *j),type)){
+                coordinates.push(r+"_"+(c + counter *j));
+            }
+        }
+        counter = 1;
+        while($('#'+(r + counter * j)+"_"+c).attr('chess') == null && $('#'+ (r + counter * j)+"_"+c).prop("tagName") != null){
+            coordinates.push((r + counter * j)+"_"+(c));
+            counter++;
+        }
+        if(hasPiece((r + counter * j),c,type)){
+            if(hasEnemy((r + counter*j),c,type)){
+                coordinates.push((r+ counter*j)+"_"+c);
+            }
+        }
+        counter = 1;
+    }
+    return coordinates;
 }
 
 function moveOptions(startPoint, coordinates, type){
@@ -269,7 +455,31 @@ function moveOptions(startPoint, coordinates, type){
     }
     return coordinates;
 }
-
+function hasPiece(x,y,type){
+    if($('#'+x+"_"+y).attr("chess") == null){
+        return false;
+    }
+    else{
+        return true;
+    }
+}
+function hasEnemy(x,y,type){
+    enemyPieceIndex = $('#'+x+"_"+y).attr("index");
+    if(pieces[enemyPieceIndex].type.slice(0,1) != type.slice(0,1)){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+function getBoardIndexPosition(startPoint){
+    let i;
+    for( i = 0; i<64; i++){
+        if(Math.floor(i/8)==startPoint.split('_')[0] && (i%8)==startPoint.split('_')[1])
+            break;
+    }
+    return i;
+}
 function toggleHighlight(options){
     options.forEach((element,index,array) => {
         $('#' + element).toggleClass("highlighted");
