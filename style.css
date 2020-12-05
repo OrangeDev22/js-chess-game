@@ -24,9 +24,11 @@ body {
   background: rgba(255, 218, 175, 0.801);
 }
 .position:hover {
-  z-index: 2;
+  /* z-index: 2;
   transform: translate(0, -10px);
-  animation: neonBlueText 1.5s ease-in-out infinite alternate;
+  animation: neonBlueText 1.5s ease-in-out infinite alternate; */
+  transition: all 0.5s ease-in-out;
+  background: rgb(7, 56, 6);
 }
 .black {
   background: rgb(138, 70, 25);

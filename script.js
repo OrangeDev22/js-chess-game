@@ -184,15 +184,16 @@ pieces.push(
 );
 
 function gameSetUp() {
+  console.log(pieces);
   $(".position").attr("chess", null);
   $(".position").attr("index", null);
-  for (let piece in pieces) {
-    $("#" + pieces[piece].position).prepend(
-      '<img class="chess-piece" src="' + pieces[piece].img + '"/>'
+  pieces.forEach((piece, index) => {
+    $(`#${piece.position}`).prepend(
+      `<img class="chess-piece" src="${piece.img}" />`
     );
-    $("#" + pieces[piece].position).attr("chess", pieces[piece].type);
-    $("#" + pieces[piece].position).attr("index", piece);
-  }
+    $(`#${piece.position}`).attr("chess", piece.type);
+    $(`#${piece.position}`).attr("index", index);
+  });
 }
 function validateMove(id) {
   let isValidated = false;
