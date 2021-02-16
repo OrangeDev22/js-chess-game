@@ -4,10 +4,6 @@ let highlighted = [];
 let prefix = 8;
 function drawBoard() {
   for (let i = 0; i < 8; i++) {
-    // let positionPrefix = document.createElement("div");
-    // positionPrefix.className = "positionPrefix";
-    // positionPrefix.textContent = prefix;
-    // board.appendChild(positionPrefix);
     prefix--;
     for (let j = 0; j < 8; j++) {
       let boardPosition = document.createElement("div");
@@ -146,42 +142,22 @@ pieces.push(b_bishop1, b_bishop2, w_bishop1, w_bishop2);
 
 //pawns
 
-let b_pawn1 = new Piece("1_0", "images/black_pawn.png", false, false, "b_pawn");
-let b_pawn2 = new Piece("1_1", "images/black_pawn.png", false, false, "b_pawn");
-let b_pawn3 = new Piece("1_2", "images/black_pawn.png", false, false, "b_pawn");
-let b_pawn4 = new Piece("1_3", "images/black_pawn.png", false, false, "b_pawn");
-let b_pawn5 = new Piece("1_4", "images/black_pawn.png", false, false, "b_pawn");
-let b_pawn6 = new Piece("1_5", "images/black_pawn.png", false, false, "b_pawn");
-let b_pawn7 = new Piece("1_6", "images/black_pawn.png", false, false, "b_pawn");
-let b_pawn8 = new Piece("1_7", "images/black_pawn.png", false, false, "b_pawn");
-
-let w_pawn1 = new Piece("6_0", "images/white_pawn.png", false, false, "w_pawn");
-let w_pawn2 = new Piece("6_1", "images/white_pawn.png", false, false, "w_pawn");
-let w_pawn3 = new Piece("6_2", "images/white_pawn.png", false, false, "w_pawn");
-let w_pawn4 = new Piece("6_3", "images/white_pawn.png", false, false, "w_pawn");
-let w_pawn5 = new Piece("6_4", "images/white_pawn.png", false, false, "w_pawn");
-let w_pawn6 = new Piece("6_5", "images/white_pawn.png", false, false, "w_pawn");
-let w_pawn7 = new Piece("6_6", "images/white_pawn.png", false, false, "w_pawn");
-let w_pawn8 = new Piece("6_7", "images/white_pawn.png", false, false, "w_pawn");
-
-pieces.push(
-  b_pawn1,
-  b_pawn2,
-  b_pawn3,
-  b_pawn4,
-  b_pawn5,
-  b_pawn6,
-  b_pawn7,
-  b_pawn8,
-  w_pawn1,
-  w_pawn2,
-  w_pawn3,
-  w_pawn4,
-  w_pawn5,
-  w_pawn6,
-  w_pawn7,
-  w_pawn8
-);
+const createPawns = () => {
+  for (let i = 0; i < 16; i++) {
+    let pawn =
+      i < 8
+        ? new Piece(`1_${i}`, "images/black_pawn.png", false, false, "b_pawn")
+        : new Piece(
+            `6_${i - 8}`,
+            "images/white_pawn.png",
+            false,
+            false,
+            "w_pawn"
+          );
+    console.log(pawn);
+    pieces.push(pawn);
+  }
+};
 
 function gameSetUp() {
   console.log(pieces);
@@ -671,6 +647,7 @@ function toggleHighlightedSelected(position) {
 }
 
 $(document).ready(function () {
+  createPawns();
   drawBoard();
   gameSetUp();
   $(".position", "div").click(function (e) {
